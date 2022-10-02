@@ -61,7 +61,6 @@ class Import_Logic:
         for line in lines:
             if not function_or_class_is_found and ('def' in line or 'class' in line) and name in line:
                 depth = len(line) - len(line.lstrip())
-                function_or_class_is_found = True
                 function_or_class.append(line)
             if function_or_class_is_found:
                 if len(line) - len(line.lstrip()) < depth:
@@ -75,3 +74,19 @@ class Import_Logic:
         return function_or_class
 
     def get_constant(self, lines, name) -> list[str]:
+        constant_is_found = False
+        constant = []
+        is_parenthesis_in_constant = False
+        for line in lines:
+            if not constant_is_found and name in line and '=' in line:
+                constant_is_found = True
+                if ['(', '[', '{', '\'\'\'', '\"\"\"'] in line:
+                    is_parenthesis_in_constant = True
+            if constant_is_found:
+                constant.append(line)
+                if is_parenthesis_in_constant:
+                    if [')', ']', '}'] in line:
+                        is_parenthesis_in_constant = False
+                        return
+                else:
+                    return
